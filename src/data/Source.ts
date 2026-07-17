@@ -401,12 +401,23 @@ function determineSourceDimensions(
 }
 
 function objectRowsCollectDimensions(data: OptionSourceDataObjectRows): DimensionDefinitionLoose[] {
-    let firstIndex = 0;
-    let obj;
-    while (firstIndex < data.length && !(obj = data[firstIndex++])) {} // jshint ignore: line
-    if (obj) {
-        return keys(obj);
+    const dimensionNameMap = createHashMap<true, DimensionName>();
+    const dimensionsDefine: DimensionDefinitionLoose[] = [];
+
+    for (let i = 0; i < data.length; i++) {
+        const obj = data[i];
+        if (!obj) {
+            continue;
+        }
+        each(keys(obj), function (name) {
+            if (!dimensionNameMap.get(name)) {
+                dimensionNameMap.set(name, true);
+                dimensionsDefine.push(name);
+            }
+        });
     }
+
+    return dimensionsDefine.length ? dimensionsDefine : void 0;
 }
 
 // Consider dimensions defined like ['A', 'price', 'B', 'price', 'C', 'price'],
