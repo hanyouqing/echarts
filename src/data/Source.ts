@@ -19,7 +19,7 @@
 
 import {
     isTypedArray, HashMap, clone, createHashMap, isArray, isObject, isArrayLike,
-    hasOwn, assert, each, map, isNumber, isString, keys
+    hasOwn, assert, each, map, isNumber, isString
 } from 'zrender/src/core/util';
 import {
     SourceFormat, SeriesLayoutBy, DimensionDefinition,
@@ -409,12 +409,12 @@ function objectRowsCollectDimensions(data: OptionSourceDataObjectRows): Dimensio
         if (!obj) {
             continue;
         }
-        each(keys(obj), function (name) {
-            if (!dimensionNameMap.get(name)) {
+        for (const name in obj) {
+            if (hasOwn(obj, name) && !dimensionNameMap.get(name)) {
                 dimensionNameMap.set(name, true);
                 dimensionsDefine.push(name);
             }
-        });
+        }
     }
 
     return dimensionsDefine.length ? dimensionsDefine : void 0;
