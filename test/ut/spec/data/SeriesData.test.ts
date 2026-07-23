@@ -25,6 +25,7 @@ import { createSourceFromSeriesDataOption, Source, createSource } from '@/src/da
 import { OptionDataItemObject,
     OptionDataValue,
     SOURCE_FORMAT_ARRAY_ROWS,
+    SOURCE_FORMAT_OBJECT_ROWS,
     SOURCE_FORMAT_ORIGINAL } from '@/src/util/types';
 import SeriesDimensionDefine from '@/src/data/SeriesDimensionDefine';
 import OrdinalMeta from '@/src/data/OrdinalMeta';
@@ -204,6 +205,19 @@ describe('SeriesData', function () {
                 sourceHeader: false
             }, SOURCE_FORMAT_ORIGINAL);
             expect(source.dimensionsDefine[0].type).toEqual('ordinal');
+        });
+
+        it('should collect dimensions across all object rows', function () {
+            const source = createSource([
+                { timestamp: 1568191020000, ECM: 26311.466666666667 },
+                { timestamp: 1568191140000, ECM: 1666775.3333333333, GSWY: 1332.5333333333333 }
+            ], {
+                dimensions: null,
+                seriesLayoutBy: null,
+                sourceHeader: false
+            }, SOURCE_FORMAT_OBJECT_ROWS);
+
+            expect(source.dimensionsDefine.map(dim => dim.name)).toEqual(['timestamp', 'ECM', 'GSWY']);
         });
 
         function createStore() {

@@ -19,7 +19,7 @@
 
 import {
     isTypedArray, HashMap, clone, createHashMap, isArray, isObject, isArrayLike,
-    hasOwn, assert, each, map, isNumber, isString, keys
+    hasOwn, assert, each, map, isNumber, isString
 } from 'zrender/src/core/util';
 import {
     SourceFormat, SeriesLayoutBy, DimensionDefinition,
@@ -401,12 +401,23 @@ function determineSourceDimensions(
 }
 
 function objectRowsCollectDimensions(data: OptionSourceDataObjectRows): DimensionDefinitionLoose[] {
-    let firstIndex = 0;
-    let obj;
-    while (firstIndex < data.length && !(obj = data[firstIndex++])) {} // jshint ignore: line
-    if (obj) {
-        return keys(obj);
+    const dimensionNameMap = createHashMap<true, DimensionName>();
+    const dimensionsDefine: DimensionDefinitionLoose[] = [];
+
+    for (let i = 0; i < data.length; i++) {
+        const obj = data[i];
+        if (!obj) {
+            continue;
+        }
+        for (const name in obj) {
+            if (hasOwn(obj, name) && !dimensionNameMap.get(name)) {
+                dimensionNameMap.set(name, true);
+                dimensionsDefine.push(name);
+            }
+        }
     }
+
+    return dimensionsDefine.length ? dimensionsDefine : void 0;
 }
 
 // Consider dimensions defined like ['A', 'price', 'B', 'price', 'C', 'price'],
